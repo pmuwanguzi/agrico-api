@@ -5,11 +5,16 @@ from dotenv import load_dotenv
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
 load_dotenv(dotenv_path)
 
+
+
 DB_USER = os.getenv("DATABASE_USER")
 DB_PASSWORD = os.getenv("DATABASE_PASSWORD")
 DB_HOST = os.getenv("DATABASE_HOST")
 DB_PORT = os.getenv("DATABASE_PORT")
 DB_NAME = os.getenv("DATABASE_NAME")
+
+print("Loaded .env from:", dotenv_path)
+print("DB_PORT:", DB_PORT)
 
 
 class Config:

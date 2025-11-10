@@ -23,7 +23,7 @@ source venv/bin/activate
 
 2. Install dependencies:
 ```bash
-pip install flask flask-sqlalchemy flask-bcrypt flask-jwt-extended psycopg2-binary python-dotenv
+pip install -r requirements.txt
 ```
 
 3. Create a `.env` file in the `backend` directory with your database configuration:
