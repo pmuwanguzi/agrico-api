@@ -23,9 +23,11 @@ def create_app():
     from app.routes.auth import auth_bp
     from app.routes.farm_routes import farm_bp
     from app.routes.crop_routes import crop_bp
+    from app.routes.expenses import expenses_bp  
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(farm_bp, url_prefix='/farms')
     app.register_blueprint(crop_bp, url_prefix='/crops')
+    app.register_blueprint(expenses_bp, url_prefix='/expenses')  
 
     return app
