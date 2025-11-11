@@ -169,3 +169,39 @@ python -m flask db init
 - **400**: Missing required fields
 - **401**: Invalid login credentials
 - **409**: User already exists (on signup)
+
+# Agrico API - Feature/Signup Updates
+
+This update includes key backend work for the **Farm Management System**. Below is a summary of the files and tasks implemented:
+
+## 1. Models (app/models/)
+- **User (`user.py`)**: User schema with `id`, `full_name`, `email`, `password`, `role`, and `created_at`.
+- **Farm (`farm.py`)**: Farm schema linked to `User` with fields like `farm_id`, `farm_name`, `location`, `size_acres`, and `created_at`.
+- **Crop (`crop.py`)**: Crop schema linked to `Farm` with fields like `crop_id`, `crop_name`, `crop_type`, `planting_date`, `harvest_date`, `expected_yield`, and `created_at`.
+
+## 2. Routes (app/routes/)
+- **Authentication (`auth.py` & `auth_routes.py`)**
+  - Signup, login, and test endpoints.
+- **Farm (`farm_routes.py`)**
+  - Create, update, delete, and list farms.
+- **Crop (`crop_routes.py`)**
+  - CRUD operations for crops, including listing crops by farm.
+
+## 3. Database Management
+- **Alembic migrations** (`migrations/` folder) for tracking schema changes.
+- **Scripts**
+  - `clear_alembic.py`: Reset Alembic migrations if needed.
+  - `view_db.py`: Quick inspection of database tables.
+  - `create_tables.py`: Optional script to create tables manually if needed.
+
+## 4. Dependencies
+- **requirements.txt** updated with necessary Python packages like Flask, Flask-Migrate, Flask-JWT-Extended, and SQLAlchemy.
+
+## 5. Key Notes
+- Modularized models for clarity and maintainability.
+- All endpoints are tested and working via Postman.
+- `models.py` under `app/` is now redundant and can be removed; use the modularized models in `app/models/`.
+
+---
+
+> Collaborators should pull this branch (`feature/signup`) to test or extend functionality. All migrations are included to keep the database schema up to date.
