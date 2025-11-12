@@ -14,18 +14,23 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    # Initialize extensions
     db.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app, db)
 
-    # Register blueprints
+    # Import and register all blueprints
     from app.routes.auth import auth_bp
     from app.routes.farm_routes import farm_bp
     from app.routes.crop_routes import crop_bp
+    from app.routes.sale_routes import sale_bp
+    from app.routes.summary_routes import summary_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(farm_bp, url_prefix='/farms')
     app.register_blueprint(crop_bp, url_prefix='/crops')
+    app.register_blueprint(sale_bp, url_prefix='/farms/<int:farm_id>/sales')
+    app.register_blueprint(summary_bp, url_prefix='/farms/<int:farm_id>/summary')
 
     return app
