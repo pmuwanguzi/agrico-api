@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify
 from app import db
-from models.expenses import Expense
+from app.models.expenses import Expense
+
 
 expenses_bp = Blueprint('expenses', __name__)
 
 # Create a new expense
-@expenses_bp.route('/expenses', methods=['POST'])
+@expenses_bp.route('', methods=['POST'])
 def create_expense():
     data = request.get_json()
     farm_id = data.get('farm_id')
@@ -37,7 +38,7 @@ def create_expense():
 
 
 # Get all expenses for a specific farm
-@expenses_bp.route('/expenses/<int:farm_id>', methods=['GET'])
+@expenses_bp.route('/<int:farm_id>', methods=['GET'])
 def get_expenses(farm_id):
     expenses = Expense.query.filter_by(farm_id=farm_id).all()
     results = [{
@@ -51,8 +52,8 @@ def get_expenses(farm_id):
     return jsonify(results), 200
 
 
-# Update an expense (must belong to farm)
-@expenses_bp.route('/expenses/<int:farm_id>/<int:expense_id>', methods=['PUT'])
+# Update an expense
+@expenses_bp.route('/<int:farm_id>/<int:expense_id>', methods=['PUT'])
 def update_expense(farm_id, expense_id):
     expense = Expense.query.filter_by(id=expense_id, farm_id=farm_id).first()
     if not expense:
@@ -68,8 +69,8 @@ def update_expense(farm_id, expense_id):
     return jsonify({"message": "Expense updated successfully"}), 200
 
 
-# Delete an expense (must belong to farm)
-@expenses_bp.route('/expenses/<int:farm_id>/<int:expense_id>', methods=['DELETE'])
+# Delete an expense
+@expenses_bp.route('/<int:farm_id>/<int:expense_id>', methods=['DELETE'])
 def delete_expense(farm_id, expense_id):
     expense = Expense.query.filter_by(id=expense_id, farm_id=farm_id).first()
     if not expense:
