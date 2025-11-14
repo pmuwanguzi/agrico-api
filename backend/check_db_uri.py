@@ -2,9 +2,9 @@ import psycopg2
 
 # Replace the credentials below with your actual PostgreSQL setup
 DB_HOST = "localhost"
-DB_NAME = "farm_management"
+DB_NAME = "agrico_db"
 DB_USER = "postgres"
-DB_PASS = "Oscar1"  # <-- replace this with your actual PostgreSQL password
+DB_PASS = "1704"  # <-- replace this with your actual PostgreSQL password
 
 try:
     connection = psycopg2.connect(
