@@ -2,9 +2,9 @@ import psycopg2
 
 # Replace the credentials below with your actual PostgreSQL setup
 DB_HOST = "localhost"
-DB_NAME = "farm_management"
+DB_NAME = "agricosales"
 DB_USER = "postgres"
-DB_PASS = "Oscar1"  # <-- replace this with your actual PostgreSQL password
+DB_PASS = "Kigali2025!"  # <-- replace this with your actual PostgreSQL password
 
 try:
     connection = psycopg2.connect(
@@ -15,3 +15,8 @@ try:
 except Exception as e:
     print(" Error connecting to database:")
     print(e)
+
+
+
+
+

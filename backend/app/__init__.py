@@ -30,7 +30,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(farm_bp, url_prefix='/farms')
     app.register_blueprint(crop_bp, url_prefix='/crops')
-    app.register_blueprint(sale_bp, url_prefix='/farms/<int:farm_id>/sales')
+    app.register_blueprint(sale_bp, url_prefix='/farms')
     app.register_blueprint(summary_bp, url_prefix='/farms/<int:farm_id>/summary')
 
     return app
