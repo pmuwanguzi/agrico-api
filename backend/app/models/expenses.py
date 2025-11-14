@@ -4,12 +4,24 @@ from datetime import datetime
 class Expense(db.Model):
     __tablename__ = "expenses"
 
-    id = db.Column(db.Integer, primary_key=True)
-    farm_id = db.Column(db.Integer, db.ForeignKey("farms.farm_id"), nullable=False)
-    expense_type = db.Column(db.String(100), nullable=False)
+    expense_id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(200))
     amount = db.Column(db.Float, nullable=False)
-    description = db.Column(db.String(255), nullable=True)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
+    date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    
+    # Correct foreign key
+    farm_id = db.Column(db.Integer, db.ForeignKey('farms.farm_id'), nullable=False)
+
+    farm = db.relationship('Farm', backref=db.backref('expenses', lazy=True))
+
+    def to_dict(self):
+        return {
+            "expense_id": self.expense_id,
+            "description": self.description,
+            "amount": self.amount,
+            "date": self.date.isoformat(),
+            "farm_id": self.farm_id
+        }
 
     def __repr__(self):
-        return f"<Expense {self.expense_type} - {self.amount}>"
+        return f"<Expense {self.description}>"
