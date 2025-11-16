@@ -1,3 +1,124 @@
+# from datetime import datetime
+# from decimal import Decimal
+# from flask import Blueprint, request, jsonify
+# from flask_jwt_extended import jwt_required, get_jwt_identity
+# from sqlalchemy import func
+# from app import db
+# from app.models.sale import Sale
+# try:
+#     from app.models.expense import Expense
+#     HAS_EXPENSE = True
+# except Exception:
+#     HAS_EXPENSE = False
+#
+# summary_bp = Blueprint("summary", __name__, url_prefix="/farms/<int:farm_id>/summary")
+#
+# def user_has_farm_access(user_id: int, farm_id: int) -> bool:
+#     ident = get_jwt_identity()
+#     if ident and ident.get("role") == "admin":
+#         return True
+#     from app.models.farm import Farm
+#     farm = Farm.query.get(farm_id)
+#     return bool(farm and getattr(farm, "user_id", None) == user_id)
+#
+# def parse_date(s):
+#     return datetime.strptime(s, "%Y-%m-%d").date()
+#
+# def daterange_filters(model_date_col, d_from, d_to, q):
+#     if d_from:
+#         q = q.filter(model_date_col >= parse_date(d_from))
+#     if d_to:
+#         q = q.filter(model_date_col <= parse_date(d_to))
+#     return q
+#
+# @summary_bp.route("/profit", methods=["GET"])
+# @jwt_required()
+# def profit_total(farm_id):
+#     ident = get_jwt_identity()
+#     if not user_has_farm_access(ident["user_id"], farm_id):
+#         return jsonify({"error": "Forbidden"}), 403
+#
+#     d_from = request.args.get("from")
+#     d_to = request.args.get("to")
+#
+#     q = db.session.query(func.coalesce(func.sum(Sale.total_amount), 0)).filter(Sale.farm_id == farm_id)
+#     q = daterange_filters(Sale.sale_date, d_from, d_to, q)
+#     total = q.scalar() or Decimal("0")
+#
+#     return jsonify({
+#         "farm_id": farm_id,
+#         "from": d_from,
+#         "to": d_to,
+#         "profit_total": float(total)
+#     }), 200
+#
+# @summary_bp.route("/loss", methods=["GET"])
+# @jwt_required()
+# def loss_total(farm_id):
+#     ident = get_jwt_identity()
+#     if not user_has_farm_access(ident["user_id"], farm_id):
+#         return jsonify({"error": "Forbidden"}), 403
+#
+#     d_from = request.args.get("from")
+#     d_to = request.args.get("to")
+#
+#     if HAS_EXPENSE:
+#         q = db.session.query(func.coalesce(func.sum(Expense.amount), 0)).filter(Expense.farm_id == farm_id)
+#         q = daterange_filters(Expense.expense_date, d_from, d_to, q)
+#         total_loss = q.scalar() or 0
+#     else:
+#         # Fallback: treat negative sales as losses (rare, but keeps endpoint functional)
+#         q = db.session.query(func.coalesce(func.sum(Sale.total_amount), 0))\
+#             .filter(Sale.farm_id == farm_id, Sale.total_amount < 0)
+#         q = daterange_filters(Sale.sale_date, d_from, d_to, q)
+#         total_loss = q.scalar() or 0
+#
+#     return jsonify({
+#         "farm_id": farm_id,
+#         "from": d_from,
+#         "to": d_to,
+#         "loss_total": float(abs(total_loss))  # as positive number
+#     }), 200
+#
+# @summary_bp.route("", methods=["GET"])
+# @jwt_required()
+# def summary(farm_id):
+#     # Combined summary: profit, loss, net
+#     ident = get_jwt_identity()
+#     if not user_has_farm_access(ident["user_id"], farm_id):
+#         return jsonify({"error": "Forbidden"}), 403
+#
+#     d_from = request.args.get("from")
+#     d_to = request.args.get("to")
+#
+#     # profit
+#     qp = db.session.query(func.coalesce(func.sum(Sale.total_amount), 0)).filter(Sale.farm_id == farm_id)
+#     qp = daterange_filters(Sale.sale_date, d_from, d_to, qp)
+#     profit_total = qp.scalar() or 0
+#
+#     # loss
+#     if HAS_EXPENSE:
+#         ql = db.session.query(func.coalesce(func.sum(Expense.amount), 0)).filter(Expense.farm_id == farm_id)
+#         ql = daterange_filters(Expense.expense_date, d_from, d_to, ql)
+#         loss_total = ql.scalar() or 0
+#     else:
+#         ql = db.session.query(func.coalesce(func.sum(Sale.total_amount), 0))\
+#             .filter(Sale.farm_id == farm_id, Sale.total_amount < 0)
+#         ql = daterange_filters(Sale.sale_date, d_from, d_to, ql)
+#         loss_total = abs(ql.scalar() or 0)
+#
+#     net = float(profit_total) - float(loss_total)
+#
+#     return jsonify({
+#         "farm_id": farm_id,
+#         "from": d_from,
+#         "to": d_to,
+#         "profit_total": float(profit_total),
+#         "loss_total": float(loss_total),
+#         "net_income": net
+#     }), 200
+
+
 from datetime import datetime
 from decimal import Decimal
 from flask import Blueprint, request, jsonify
@@ -5,44 +126,66 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import func
 from app import db
 from app.models.sale import Sale
-try:
-    from app.models.expense import Expense
-    HAS_EXPENSE = True
-except Exception:
-    HAS_EXPENSE = False
+from app.models.expense import Expense
+from app.models.farm import Farm
 
-summary_bp = Blueprint("summary", __name__, url_prefix="/farms/<int:farm_id>/summary")
+summary_bp = Blueprint(
+    "summary",
+    __name__,
+    url_prefix="/farms/<int:farm_id>/summary"
+)
 
-def user_has_farm_access(user_id: int, farm_id: int) -> bool:
-    ident = get_jwt_identity()
-    if ident and ident.get("role") == "admin":
+
+# ------------------- Helpers -------------------
+
+def user_has_farm_access(user, farm_id: int) -> bool:
+    """Admins have access to all farms. Owners only to their farm."""
+    if user.get("role") == "admin":
         return True
-    from app.models.farm import Farm
     farm = Farm.query.get(farm_id)
-    return bool(farm and getattr(farm, "user_id", None) == user_id)
+    return farm and farm.user_id == user.get("user_id")
 
-def parse_date(s):
-    return datetime.strptime(s, "%Y-%m-%d").date()
 
-def daterange_filters(model_date_col, d_from, d_to, q):
+def parse_date(date_str):
+    """Parse date in YYYY-MM-DD format."""
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").date()
+    except Exception:
+        return None
+
+
+def apply_date_filters(query, column, d_from, d_to):
+    """Apply optional date filters safely."""
     if d_from:
-        q = q.filter(model_date_col >= parse_date(d_from))
+        d = parse_date(d_from)
+        if d:
+            query = query.filter(column >= d)
     if d_to:
-        q = q.filter(model_date_col <= parse_date(d_to))
-    return q
+        d = parse_date(d_to)
+        if d:
+            query = query.filter(column <= d)
+    return query
 
+
+
+
+# PROFIT TOTAL
 @summary_bp.route("/profit", methods=["GET"])
 @jwt_required()
 def profit_total(farm_id):
-    ident = get_jwt_identity()
-    if not user_has_farm_access(ident["user_id"], farm_id):
+    user = get_jwt_identity()
+
+    if not user_has_farm_access(user, farm_id):
         return jsonify({"error": "Forbidden"}), 403
 
     d_from = request.args.get("from")
     d_to = request.args.get("to")
 
-    q = db.session.query(func.coalesce(func.sum(Sale.total_amount), 0)).filter(Sale.farm_id == farm_id)
-    q = daterange_filters(Sale.sale_date, d_from, d_to, q)
+    q = db.session.query(func.coalesce(func.sum(Sale.total_amount), 0)) \
+        .filter(Sale.farm_id == farm_id)
+
+    q = apply_date_filters(q, Sale.sale_date, d_from, d_to)
+
     total = q.scalar() or Decimal("0")
 
     return jsonify({
@@ -52,61 +195,60 @@ def profit_total(farm_id):
         "profit_total": float(total)
     }), 200
 
+
+#  LOSS TOTAL
 @summary_bp.route("/loss", methods=["GET"])
 @jwt_required()
 def loss_total(farm_id):
-    ident = get_jwt_identity()
-    if not user_has_farm_access(ident["user_id"], farm_id):
+    user = get_jwt_identity()
+
+    if not user_has_farm_access(user, farm_id):
         return jsonify({"error": "Forbidden"}), 403
 
     d_from = request.args.get("from")
     d_to = request.args.get("to")
 
-    if HAS_EXPENSE:
-        q = db.session.query(func.coalesce(func.sum(Expense.amount), 0)).filter(Expense.farm_id == farm_id)
-        q = daterange_filters(Expense.expense_date, d_from, d_to, q)
-        total_loss = q.scalar() or 0
-    else:
-        # Fallback: treat negative sales as losses (rare, but keeps endpoint functional)
-        q = db.session.query(func.coalesce(func.sum(Sale.total_amount), 0))\
-            .filter(Sale.farm_id == farm_id, Sale.total_amount < 0)
-        q = daterange_filters(Sale.sale_date, d_from, d_to, q)
-        total_loss = q.scalar() or 0
+    q = db.session.query(func.coalesce(func.sum(Expense.amount), 0)) \
+        .filter(Expense.farm_id == farm_id)
+
+
+    q = apply_date_filters(q, Expense.date, d_from, d_to)
+
+    total_loss = q.scalar() or 0
 
     return jsonify({
         "farm_id": farm_id,
         "from": d_from,
         "to": d_to,
-        "loss_total": float(abs(total_loss))  # as positive number
+        "loss_total": float(total_loss)
     }), 200
 
+
+# COMBINED SUMMARY
 @summary_bp.route("", methods=["GET"])
 @jwt_required()
 def summary(farm_id):
-    # Combined summary: profit, loss, net
-    ident = get_jwt_identity()
-    if not user_has_farm_access(ident["user_id"], farm_id):
+    user = get_jwt_identity()
+
+    if not user_has_farm_access(user, farm_id):
         return jsonify({"error": "Forbidden"}), 403
 
     d_from = request.args.get("from")
     d_to = request.args.get("to")
 
-    # profit
-    qp = db.session.query(func.coalesce(func.sum(Sale.total_amount), 0)).filter(Sale.farm_id == farm_id)
-    qp = daterange_filters(Sale.sale_date, d_from, d_to, qp)
+    # ----- PROFIT -----
+    qp = db.session.query(func.coalesce(func.sum(Sale.total_amount), 0)) \
+        .filter(Sale.farm_id == farm_id)
+    qp = apply_date_filters(qp, Sale.sale_date, d_from, d_to)
     profit_total = qp.scalar() or 0
 
-    # loss
-    if HAS_EXPENSE:
-        ql = db.session.query(func.coalesce(func.sum(Expense.amount), 0)).filter(Expense.farm_id == farm_id)
-        ql = daterange_filters(Expense.expense_date, d_from, d_to, ql)
-        loss_total = ql.scalar() or 0
-    else:
-        ql = db.session.query(func.coalesce(func.sum(Sale.total_amount), 0))\
-            .filter(Sale.farm_id == farm_id, Sale.total_amount < 0)
-        ql = daterange_filters(Sale.sale_date, d_from, d_to, ql)
-        loss_total = abs(ql.scalar() or 0)
+    # ----- LOSS -----
+    ql = db.session.query(func.coalesce(func.sum(Expense.amount), 0)) \
+        .filter(Expense.farm_id == farm_id)
+    ql = apply_date_filters(ql, Expense.date, d_from, d_to)
+    loss_total = ql.scalar() or 0
 
+    # ----- NET -----
     net = float(profit_total) - float(loss_total)
 
     return jsonify({
