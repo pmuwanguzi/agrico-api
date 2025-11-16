@@ -127,22 +127,22 @@ $body = @{
 Invoke-RestMethod -Uri 'http://127.0.0.1:5000/auth/login' -Method Post -ContentType 'application/json' -Body ($body | ConvertTo-Json)
 ```
 
-Livestock Routes
+### Livestock Routes
 
 All livestock routes are prefixed with /livestock
 Authentication Required: Yes (JWT token)
 
-Create Livestock Record
+## Create Livestock Record
 
-URL: POST /livestock/
+**URL**: POST /livestock/
 
-Headers:
+**Headers**:
 
-Authorization: Bearer <your_jwt_token>
+**Authorization**: Bearer <your_jwt_token>
 
-Content-Type: application/json
+**Content-Type**: application/json
 
-Body:
+**Body**:
 
 {
     "farm_id": 1,
@@ -153,14 +153,14 @@ Body:
 }
 
 
-Success Response (201):
+**Success Response (201)**:
 
 {
     "message": "Livestock created successfully",
     "id": 5
 }
 
-Get All Livestock for a Farm
+## Get All Livestock for a Farm
 
 URL: GET /livestock/<farm_id>
 
@@ -168,7 +168,7 @@ Headers:
 
 Authorization: Bearer <your_jwt_token>
 
-Success Response (200):
+**Success Response (200)**:
 
 [
     {
@@ -180,7 +180,7 @@ Success Response (200):
     }
 ]
 
-Update Livestock
+## Update Livestock
 
 URL: PUT /livestock/<id>
 
@@ -206,7 +206,7 @@ Success Response (200):
     "message": "Livestock updated successfully"
 }
 
-Delete Livestock
+## Delete Livestock
 
 URL: DELETE /livestock/<id>
 
@@ -214,18 +214,18 @@ Headers:
 
 Authorization: Bearer <your_jwt_token>
 
-Success Response (200):
+**Success Response (200)**:
 
 {
     "message": "Livestock deleted successfully"
 }
 
-Expenses Routes
+### Expenses Routes
 
 All expenses routes are prefixed with /expenses
 Note: Create/Update/Delete requires admin role
 
-Create Expense (Admin Only)
+## Create Expense (Admin Only)
 
 URL: POST /expenses/
 
@@ -245,7 +245,7 @@ Body:
 }
 
 
-Success Response (201):
+**Success Response (201)**:
 
 {
     "message": "Expense created",
@@ -258,7 +258,7 @@ Success Response (201):
     }
 }
 
-Get All Expenses for a Farm
+## Get All Expenses for a Farm
 
 URL: GET /expenses/<farm_id>
 
@@ -266,7 +266,7 @@ Headers:
 
 Authorization: Bearer <your_jwt_token>
 
-Success Response (200):
+**Success Response (200)**:
 
 [
     {
@@ -278,7 +278,7 @@ Success Response (200):
     }
 ]
 
-Update Expense (Admin Only)
+## Update Expense (Admin Only)
 
 URL: PUT /expenses/<expense_id>
 
@@ -297,7 +297,7 @@ Body:
 }
 
 
-Success Response (200):
+**Success Response (200)**:
 
 {
     "message": "Expense updated",
@@ -310,7 +310,7 @@ Success Response (200):
     }
 }
 
-Delete Expense (Admin Only)
+## Delete Expense (Admin Only)
 
 URL: DELETE /expenses/<expense_id>
 
@@ -318,7 +318,7 @@ Headers:
 
 Authorization: Bearer <your_jwt_token>
 
-Success Response (200):
+**Success Response (200)**:
 
 {
     "message": "Expense deleted"
