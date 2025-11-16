@@ -7,7 +7,7 @@ class Sale(db.Model):
     __tablename__ = "sales"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)  # sale_id
-    farm_id: Mapped[int] = mapped_column(ForeignKey("farms.id", ondelete="CASCADE"), nullable=False)
+    farm_id: Mapped[int] = mapped_column(ForeignKey("farms.farm_id", ondelete="CASCADE"), nullable=False)
 
     item_name: Mapped[str] = mapped_column(nullable=False)
     quantity: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
