@@ -137,7 +137,9 @@ Create Livestock Record
 URL: POST /livestock/
 
 Headers:
+
 Authorization: Bearer <your_jwt_token>
+
 Content-Type: application/json
 
 Body:
@@ -162,7 +164,9 @@ Get All Livestock for a Farm
 
 URL: GET /livestock/<farm_id>
 
-Headers: Authorization: Bearer <your_jwt_token>
+Headers:
+
+Authorization: Bearer <your_jwt_token>
 
 Success Response (200):
 
@@ -181,7 +185,9 @@ Update Livestock
 URL: PUT /livestock/<id>
 
 Headers:
+
 Authorization: Bearer <your_jwt_token>
+
 Content-Type: application/json
 
 Body:
@@ -204,7 +210,9 @@ Delete Livestock
 
 URL: DELETE /livestock/<id>
 
-Headers: Authorization: Bearer <your_jwt_token>
+Headers:
+
+Authorization: Bearer <your_jwt_token>
 
 Success Response (200):
 
@@ -222,7 +230,9 @@ Create Expense (Admin Only)
 URL: POST /expenses/
 
 Headers:
+
 Authorization: Bearer <your_jwt_token>
+
 Content-Type: application/json
 
 Body:
@@ -252,7 +262,9 @@ Get All Expenses for a Farm
 
 URL: GET /expenses/<farm_id>
 
-Headers: Authorization: Bearer <your_jwt_token>
+Headers:
+
+Authorization: Bearer <your_jwt_token>
 
 Success Response (200):
 
@@ -271,7 +283,9 @@ Update Expense (Admin Only)
 URL: PUT /expenses/<expense_id>
 
 Headers:
+
 Authorization: Bearer <your_jwt_token>
+
 Content-Type: application/json
 
 Body:
@@ -300,13 +314,16 @@ Delete Expense (Admin Only)
 
 URL: DELETE /expenses/<expense_id>
 
-Headers: Authorization: Bearer <your_jwt_token>
+Headers:
+
+Authorization: Bearer <your_jwt_token>
 
 Success Response (200):
 
 {
     "message": "Expense deleted"
 }
+
 ## Database Setup
 
 Before running the application:
