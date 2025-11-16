@@ -127,6 +127,186 @@ $body = @{
 Invoke-RestMethod -Uri 'http://127.0.0.1:5000/auth/login' -Method Post -ContentType 'application/json' -Body ($body | ConvertTo-Json)
 ```
 
+Livestock Routes
+
+All livestock routes are prefixed with /livestock
+Authentication Required: Yes (JWT token)
+
+Create Livestock Record
+
+URL: POST /livestock/
+
+Headers:
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+Body:
+
+{
+    "farm_id": 1,
+    "animal_type": "Cattle",
+    "quantity": 15,
+    "purchase_date": "2024-01-15",
+    "health_status": "Healthy"
+}
+
+
+Success Response (201):
+
+{
+    "message": "Livestock created successfully",
+    "id": 5
+}
+
+Get All Livestock for a Farm
+
+URL: GET /livestock/<farm_id>
+
+Headers: Authorization: Bearer <your_jwt_token>
+
+Success Response (200):
+
+[
+    {
+        "id": 1,
+        "animal_type": "Goats",
+        "quantity": 20,
+        "purchase_date": "2024-02-01",
+        "health_status": "Good"
+    }
+]
+
+Update Livestock
+
+URL: PUT /livestock/<id>
+
+Headers:
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+Body:
+
+{
+    "animal_type": "Cattle",
+    "quantity": 12,
+    "purchase_date": "2024-01-20",
+    "health_status": "Vaccinated"
+}
+
+
+Success Response (200):
+
+{
+    "message": "Livestock updated successfully"
+}
+
+Delete Livestock
+
+URL: DELETE /livestock/<id>
+
+Headers: Authorization: Bearer <your_jwt_token>
+
+Success Response (200):
+
+{
+    "message": "Livestock deleted successfully"
+}
+
+Expenses Routes
+
+All expenses routes are prefixed with /expenses
+Note: Create/Update/Delete requires admin role
+
+Create Expense (Admin Only)
+
+URL: POST /expenses/
+
+Headers:
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+Body:
+
+{
+    "farm_id": 1,
+    "amount": 50000,
+    "description": "Purchase of animal feeds",
+    "date": "2024-01-10"
+}
+
+
+Success Response (201):
+
+{
+    "message": "Expense created",
+    "expense": {
+        "expense_id": 3,
+        "description": "Purchase of animal feeds",
+        "amount": 50000,
+        "date": "2024-01-10",
+        "farm_id": 1
+    }
+}
+
+Get All Expenses for a Farm
+
+URL: GET /expenses/<farm_id>
+
+Headers: Authorization: Bearer <your_jwt_token>
+
+Success Response (200):
+
+[
+    {
+        "expense_id": 1,
+        "description": "Veterinary services",
+        "amount": 15000,
+        "date": "2024-01-05",
+        "farm_id": 1
+    }
+]
+
+Update Expense (Admin Only)
+
+URL: PUT /expenses/<expense_id>
+
+Headers:
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+
+Body:
+
+{
+    "description": "Updated description",
+    "amount": 60000,
+    "date": "2024-01-12"
+}
+
+
+Success Response (200):
+
+{
+    "message": "Expense updated",
+    "expense": {
+        "expense_id": 3,
+        "description": "Updated description",
+        "amount": 60000,
+        "date": "2024-01-12",
+        "farm_id": 1
+    }
+}
+
+Delete Expense (Admin Only)
+
+URL: DELETE /expenses/<expense_id>
+
+Headers: Authorization: Bearer <your_jwt_token>
+
+Success Response (200):
+
+{
+    "message": "Expense deleted"
+}
 ## Database Setup
 
 Before running the application:
