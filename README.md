@@ -1,342 +1,280 @@
-﻿# Agrico API Assignment Work
+Agrico Farm Management System – Backend API (Flask)
 
+A RESTful API for managing farm operations including authentication, livestock, expenses, sales, and farm summaries.
+Built using Flask, PostgreSQL, and JWT authentication.
 
-Farm Management System A web-based farm management system built with Flask (Backend) and modern frontend technologies.
+📦 Project Structure
+backend/
+│── app/
+│   ├── auth/          # Authentication routes
+│   ├── livestock/     # Livestock routes
+│   ├── expenses/      # Expense routes
+│   ├── sales/         # Sales routes
+│   ├── summary/       # Summary analytics
+│   ├── models/        # SQLAlchemy models
+│   ├── utils/         # JWT utilities and helpers
+│── create_tables.py   # Database initialization
+│── check_db.py        # Database connectivity test
+│── run.py             # Entry point to run the server
+│── requirements.txt
+│── .env.example
 
-
-# Agrico API Backend
-
-This is the backend API for the Agrico Farm Management System built with Flask.
-
-## Setup
-
-1. Create a virtual environment and activate it:
-```bash
-# Windows
+🔧 Setup Instructions
+1. Create and Activate Virtual Environment
+Windows:
 python -m venv venv
-.\venv\Scripts\activate
+venv\Scripts\activate
 
-# Linux/Mac
+Linux/Mac:
 python -m venv venv
 source venv/bin/activate
-```
 
-2. Install dependencies:
-```bash
+2. Install Dependencies
 pip install -r requirements.txt
-```
 
-3. Create a `.env` file in the `backend` directory with your database configuration:
-```env
-DATABASE_USER=your_db_user
-DATABASE_PASSWORD=your_db_password
+3. Create .env File
+
+Create a .env in the backend/ directory.
+
+Example:
+
+DATABASE_USER=your_database_user
+DATABASE_PASSWORD=your_database_password
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
-DATABASE_NAME=your_db_name
-JWT_SECRET_KEY=your_secret_key
-```
+DATABASE_NAME=agrico_db
 
-## Running the Server
+JWT_SECRET_KEY=your_jwt_secret_key
 
-From the `backend` directory:
-```bash
-python run.py
-```
-The server will start at `http://127.0.0.1:5000`
+🗄️ Database Setup
+1. Create PostgreSQL Database
+CREATE DATABASE agrico_db;
 
-## API Routes
-
-### Authentication Routes
-
-All authentication routes are prefixed with `/auth`
-
-#### Create Account (Signup)
-- **URL**: `POST /auth/signup`
-- **Headers**: `Content-Type: application/json`
-- **Body**:
-```json
-{
-    "full_name": "John Doe",
-    "email": "john@example.com",
-    "password": "secretpassword",
-    "role": "farmer"  // optional, defaults to "farmer"
-}
-```
-- **Success Response** (201):
-```json
-{
-    "message": "User john@example.com created successfully"
-}
-```
-
-#### Login
-- **URL**: `POST /auth/login`
-- **Headers**: `Content-Type: application/json`
-- **Body**:
-```json
-{
-    "email": "john@example.com",
-    "password": "secretpassword"
-}
-```
-- **Success Response** (200):
-```json
-{
-    "message": "Login successful",
-    "access_token": "your.jwt.token",
-    "user": {
-        "id": 1,
-        "full_name": "John Doe",
-        "email": "john@example.com",
-        "role": "farmer"
-    }
-}
-```
-
-### Test Routes
-
-#### List All Routes
-- **URL**: `GET /auth/test`
-- **Description**: Returns a list of all registered routes in the application
-- **No authentication required**
-
-## Testing with PowerShell
-
-### List Routes
-```powershell
-Invoke-RestMethod -Uri 'http://127.0.0.1:5000/auth/test' -Method Get
-```
-
-### Create Account
-```powershell
-$body = @{
-    full_name = "John Doe"
-    email = "john@example.com"
-    password = "secretpassword"
-    role = "farmer"
-}
-Invoke-RestMethod -Uri 'http://127.0.0.1:5000/auth/signup' -Method Post -ContentType 'application/json' -Body ($body | ConvertTo-Json)
-```
-
-### Login
-```powershell
-$body = @{
-    email = "john@example.com"
-    password = "secretpassword"
-}
-Invoke-RestMethod -Uri 'http://127.0.0.1:5000/auth/login' -Method Post -ContentType 'application/json' -Body ($body | ConvertTo-Json)
-```
-
-### Livestock Routes
-
-All livestock routes are prefixed with /livestock
-Authentication Required: Yes (JWT token)
-
-## Create Livestock Record
-
-**URL**: POST /livestock/
-
-**Headers**:
-
-**Authorization**: Bearer <your_jwt_token>
-
-**Content-Type**: application/json
-
-**Body**:
-
-{
-    "farm_id": 1,
-    "animal_type": "Cattle",
-    "quantity": 15,
-    "purchase_date": "2024-01-15",
-    "health_status": "Healthy"
-}
-
-
-**Success Response (201)**:
-
-{
-    "message": "Livestock created successfully",
-    "id": 5
-}
-
-## Get All Livestock for a Farm
-
-URL: GET /livestock/<farm_id>
-
-Headers:
-
-Authorization: Bearer <your_jwt_token>
-
-**Success Response (200)**:
-
-[
-    {
-        "id": 1,
-        "animal_type": "Goats",
-        "quantity": 20,
-        "purchase_date": "2024-02-01",
-        "health_status": "Good"
-    }
-]
-
-## Update Livestock
-
-URL: PUT /livestock/<id>
-
-Headers:
-
-Authorization: Bearer <your_jwt_token>
-
-Content-Type: application/json
-
-Body:
-
-{
-    "animal_type": "Cattle",
-    "quantity": 12,
-    "purchase_date": "2024-01-20",
-    "health_status": "Vaccinated"
-}
-
-
-Success Response (200):
-
-{
-    "message": "Livestock updated successfully"
-}
-
-## Delete Livestock
-
-URL: DELETE /livestock/<id>
-
-Headers:
-
-Authorization: Bearer <your_jwt_token>
-
-**Success Response (200)**:
-
-{
-    "message": "Livestock deleted successfully"
-}
-
-### Expenses Routes
-
-All expenses routes are prefixed with /expenses
-Note: Create/Update/Delete requires admin role
-
-## Create Expense (Admin Only)
-
-URL: POST /expenses/
-
-Headers:
-
-Authorization: Bearer <your_jwt_token>
-
-Content-Type: application/json
-
-Body:
-
-{
-    "farm_id": 1,
-    "amount": 50000,
-    "description": "Purchase of animal feeds",
-    "date": "2024-01-10"
-}
-
-
-**Success Response (201)**:
-
-{
-    "message": "Expense created",
-    "expense": {
-        "expense_id": 3,
-        "description": "Purchase of animal feeds",
-        "amount": 50000,
-        "date": "2024-01-10",
-        "farm_id": 1
-    }
-}
-
-## Get All Expenses for a Farm
-
-URL: GET /expenses/<farm_id>
-
-Headers:
-
-Authorization: Bearer <your_jwt_token>
-
-**Success Response (200)**:
-
-[
-    {
-        "expense_id": 1,
-        "description": "Veterinary services",
-        "amount": 15000,
-        "date": "2024-01-05",
-        "farm_id": 1
-    }
-]
-
-## Update Expense (Admin Only)
-
-URL: PUT /expenses/<expense_id>
-
-Headers:
-
-Authorization: Bearer <your_jwt_token>
-
-Content-Type: application/json
-
-Body:
-
-{
-    "description": "Updated description",
-    "amount": 60000,
-    "date": "2024-01-12"
-}
-
-
-**Success Response (200)**:
-
-{
-    "message": "Expense updated",
-    "expense": {
-        "expense_id": 3,
-        "description": "Updated description",
-        "amount": 60000,
-        "date": "2024-01-12",
-        "farm_id": 1
-    }
-}
-
-## Delete Expense (Admin Only)
-
-URL: DELETE /expenses/<expense_id>
-
-Headers:
-
-Authorization: Bearer <your_jwt_token>
-
-**Success Response (200)**:
-
-{
-    "message": "Expense deleted"
-}
-
-## Database Setup
-
-Before running the application:
-
-1. Create the database in PostgreSQL
-2. Update the `.env` file with your database credentials
-3. Run the database initialization script:
-```bash
+2. Run Table Initialization
 python create_tables.py
-```
 
-## Error Responses
+3. Test Database Connection
+python check_db.py
 
-- **400**: Missing required fields
-- **401**: Invalid login credentials
-- **409**: User already exists (on signup)
+
+If successful, you will see:
+
+Database connection successful!
+
+🚀 Running the Server
+python run.py
+
+
+Server runs on:
+
+http://127.0.0.1:5000
+
+📌 API DOCUMENTATION
+1️⃣ Authentication Routes
+
+Prefix: /auth
+
+🔹 Create Account (Signup)
+
+POST http://127.0.0.1:5000/auth/signup
+
+Body
+
+{
+  "full_name": "John Doe",
+  "email": "john@example.com",
+  "password": "StrongPass123",
+  "role": "farmer"
+}
+
+🔹 Login
+
+POST http://127.0.0.1:5000/auth/login
+
+Body
+
+{
+  "email": "john@example.com",
+  "password": "StrongPass123"
+}
+
+🔹 List All Routes (Test Route)
+
+GET http://127.0.0.1:5000/auth/test
+
+2️⃣ Livestock Routes
+
+Prefix: /livestock
+(JWT Required)
+
+🔹 Create Livestock
+
+POST http://127.0.0.1:5000/livestock/
+
+Body
+
+{
+  "farm_id": 1,
+  "animal_type": "Cattle",
+  "quantity": 10,
+  "purchase_date": "2024-01-15",
+  "health_status": "Healthy"
+}
+
+🔹 Get Livestock by Farm
+
+GET http://127.0.0.1:5000/livestock/<farm_id>
+
+🔹 Update Livestock
+
+PUT http://127.0.0.1:5000/livestock/<livestock_id>
+
+Body
+
+{
+  "animal_type": "Goat",
+  "quantity": 18,
+  "purchase_date": "2024-02-01",
+  "health_status": "Vaccinated"
+}
+
+🔹 Delete Livestock
+
+DELETE
+http://127.0.0.1:5000/livestock/<livestock_id>
+
+3️⃣ Expenses Routes
+
+Prefix: /expenses
+(Admin-only for CREATE/UPDATE/DELETE)
+
+🔹 Create Expense (Admin)
+
+POST http://127.0.0.1:5000/expenses/
+
+Body
+
+{
+  "farm_id": 1,
+  "amount": 45000,
+  "description": "Animal feed purchase",
+  "date": "2024-01-10"
+}
+
+🔹 Get Expenses by Farm
+
+GET http://127.0.0.1:5000/expenses/<farm_id>
+
+🔹 Update Expense (Admin)
+
+PUT http://127.0.0.1:5000/expenses/<expense_id>
+
+Body
+
+{
+  "description": "Updated description",
+  "amount": 50000,
+  "date": "2024-01-12"
+}
+
+🔹 Delete Expense (Admin)
+
+DELETE
+http://127.0.0.1:5000/expenses/<expense_id>
+
+4️⃣ Sales Routes
+
+Prefix: /sales
+
+🔹 Record Sale
+
+POST http://127.0.0.1:5000/sales/
+
+Body
+
+{
+  "farm_id": 1,
+  "product": "Milk",
+  "quantity": 120,
+  "unit_price": 150,
+  "date": "2024-01-20"
+}
+
+🔹 Get Sales for Farm
+
+GET http://127.0.0.1:5000/sales/<farm_id>
+
+🔹 Update Sale
+
+PUT http://127.0.0.1:5000/sales/<sale_id>
+
+Body
+
+{
+  "quantity": 130,
+  "unit_price": 160,
+  "date": "2024-01-22"
+}
+
+🔹 Delete Sale
+
+DELETE
+http://127.0.0.1:5000/sales/<sale_id>
+
+5️⃣ Summary / Analytics Routes
+
+Prefix: /summary
+
+🔹 Get Farm Summary
+
+GET http://127.0.0.1:5000/summary/<farm_id>
+
+Returns aggregated data:
+
+total livestock count
+
+total expenses
+
+total sales revenue
+
+profit/loss
+
+livestock breakdown
+
+monthly expense/sales chart
+
+Sample Response:
+
+{
+  "farm_id": 1,
+  "total_livestock": 25,
+  "total_expenses": 120000,
+  "total_sales": 180000,
+  "profit": 60000
+}
+
+⚠️ Error Responses
+Code	Meaning
+400	Bad Request / Missing fields
+401	Unauthorized (invalid credentials or no token)
+403	Forbidden (admin-only routes)
+404	Record not found
+409	Conflict (duplicate email on signup)
+✔️ Endpoints Overview (Quick Copy Table)
+Category	Method	Endpoint
+Auth	POST	/auth/signup
+Auth	POST	/auth/login
+Auth	GET	/auth/test
+Livestock	POST	/livestock/
+Livestock	GET	/livestock/<farm_id>
+Livestock	PUT	/livestock/<livestock_id>
+Livestock	DELETE	/livestock/<livestock_id>
+Expenses	POST	/expenses/
+Expenses	GET	/expenses/<farm_id>
+Expenses	PUT	/expenses/<expense_id>
+Expenses	DELETE	/expenses/<expense_id>
+Sales	POST	/sales/
+Sales	GET	/sales/<farm_id>
+Sales	PUT	/sales/<sale_id>
+Sales	DELETE	/sales/<sale_id>
+Summary	GET	/summary/<farm_id>
