@@ -1,5 +1,3 @@
-
-
 # **Agrico Farm Management System – Backend API (Flask)**
 
 A RESTful API for managing farm operations including authentication, livestock, expenses, sales, and farm summaries.
@@ -7,7 +5,7 @@ Built using **Flask**, **PostgreSQL**, and **JWT authentication**.
 
 ---
 
-# **📦 Project Structure**
+# ** Project Structure**
 
 ```
 backend/
@@ -74,7 +72,7 @@ JWT_SECRET_KEY=your_jwt_secret_key
 
 ---
 
-# **🗄️ Database Setup**
+# ** Database Setup**
 
 ### **1. Create PostgreSQL Database**
 
@@ -102,7 +100,7 @@ Database connection successful!
 
 ---
 
-# **🚀 Running the Server**
+# ** Running the Server**
 
 ```bash
 python run.py
@@ -116,7 +114,7 @@ http://127.0.0.1:5000
 
 ---
 
-# **📌 API DOCUMENTATION**
+# ** API DOCUMENTATION**
 
 ---
 
@@ -358,7 +356,7 @@ Sample Response:
 
 ---
 
-# **⚠️ Error Responses**
+# ** Error Responses**
 
 | Code    | Meaning                                        |
 | ------- | ---------------------------------------------- |
