@@ -1,3 +1,10 @@
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
+from app.config import Config
+
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 jwt = JWTManager()
@@ -26,7 +33,8 @@ def create_app():
     app.register_blueprint(crop_bp, url_prefix='/crops')
     app.register_blueprint(livestock_bp)
     app.register_blueprint(expenses_bp)
+
     app.register_blueprint(dashboard_bp)
 
 
-return app
+    return app
