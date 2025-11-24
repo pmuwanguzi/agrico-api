@@ -27,13 +27,14 @@ def create_app():
     from app.routes.livestock_routes import livestock_bp
     from app.routes.expenses_routes import expenses_bp
     from app.routes.dashboard import dashboard_bp
+    from app.routes.sales_routes import sales_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(farm_bp, url_prefix='/farms')
     app.register_blueprint(crop_bp, url_prefix='/crops')
     app.register_blueprint(livestock_bp)
     app.register_blueprint(expenses_bp)
-
+    app.register_blueprint(sales_bp)
     app.register_blueprint(dashboard_bp)
 
 
